@@ -80,7 +80,8 @@ def diarize(audio_filename: str, output_filename: str, hugging_face_token: str) 
     if not os.path.exists(output_filename):
         pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
-            use_auth_token=hugging_face_token
+            use_auth_token=hugging_face_token,
+            cache_dir="models/pyannote"
         )
         pipeline.to(torch.device("mps"))
         diarization = pipeline(audio_filename)
@@ -116,7 +117,9 @@ def update_frames(
             ("models/dnn/res10_300x300_ssd_iter_140000_fp16.caffemodel",
              "https://github.com/spmallick/learnopencv/raw/master/FaceDetectionComparison/models/res10_300x300_ssd_iter_140000_fp16.caffemodel")
         ]
-        for required_file_filename, required_file_url in required_files:
+        if not os.path.exists("models/dnn"):
+            os.mkdir("models/dnn")
+        for (required_file_filename, required_file_url) in required_files:
             if not os.path.exists(required_file_filename):
                 data = requests.get(
                     url=required_file_url,
