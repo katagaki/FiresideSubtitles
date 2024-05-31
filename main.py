@@ -1,5 +1,7 @@
 import os
 
+from dotenv import load_dotenv
+
 from core import (
     open_video_file,
     extract_audio_from_video,
@@ -9,6 +11,8 @@ from core import (
     export_video,
     replace_audio_in_video
 )
+
+load_dotenv()
 
 if __name__ == "__main__":
     hugging_face_token = os.environ["HUGGING_FACE_TOKEN"]
