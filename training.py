@@ -14,9 +14,12 @@ def train_face_model(images_path: str, output_model_filename: str):
     for (index, image_path) in enumerate(images):
         name = image_path.split(os.path.sep)[-2]
         image = cv2.imread(image_path)
-        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        identified_face_locations = face_recognition.face_locations(rgb, model="hog")
-        encodings = face_recognition.face_encodings(rgb, identified_face_locations)
+
+        image_in_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        identified_face_locations = face_recognition.face_locations(image_in_rgb, model="cnn")
+        print(f"Found {len(identified_face_locations)} face(s) in {image_path}")
+
+        encodings = face_recognition.face_encodings(image_in_rgb, identified_face_locations)
         for encoding in encodings:
             known_encodings.append(encoding)
             known_names.append(name)

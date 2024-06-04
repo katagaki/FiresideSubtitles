@@ -3,7 +3,7 @@ from typing import Any
 import cv2
 from cv2 import VideoCapture
 
-from classes import FiresideSegment
+from core.classes import FiresideSegment
 from core.faces import (
     get_face_detection_model,
     get_face_recognition_model,
@@ -54,7 +54,7 @@ def draw_subtitles(
             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
             fontScale=0.55,
             color=(18, 18, 18),
-            thickness=2,
+            thickness=1,
             lineType=cv2.LINE_AA
         )
         cv2.putText(
@@ -64,7 +64,7 @@ def draw_subtitles(
             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
             fontScale=0.55,
             color=(255, 255, 255),
-            thickness=2,
+            thickness=1,
             lineType=cv2.LINE_AA
         )
 
@@ -74,7 +74,8 @@ def update_frames(
         should_highlight_faces: bool = True,
         should_label_faces: bool = True,
         transcription_segments: list[FiresideSegment] = None,
-        diarization_segments: list[FiresideSegment] = None
+        diarization_segments: list[FiresideSegment] = None,
+        should_show_preview: bool = False
 ) -> list[Any]:
     if should_highlight_faces:
         print("Initializing face detection...")
@@ -97,11 +98,11 @@ def update_frames(
         if not is_frame_read_successfully:
             break
 
-        if face_detection_model:
-            highlight_faces(frame, face_detection_model)
-
         if face_recognition_model:
             label_faces(frame, face_recognition_model)
+
+        if face_detection_model:
+            highlight_faces(frame, face_detection_model)
 
         draw_subtitles(
             frame=frame,
@@ -115,5 +116,11 @@ def update_frames(
         frame_count += 1
         print(".", end="")
 
+        if should_show_preview:
+            cv2.imshow("Frame Preview", frame)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+
+    cv2.destroyAllWindows()
     print("")
     return frames

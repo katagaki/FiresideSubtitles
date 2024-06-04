@@ -77,11 +77,11 @@ def highlight_faces(frame: Any, face_detection_model: Any):
                 img=overlay_box,
                 pt1=(startX, startY),
                 pt2=(endX, endY),
-                color=(0, 0, 255),
+                color=(255, 0, 0),
                 thickness=cv2.FILLED
             )
 
-            alpha = 0.3
+            alpha = 0.8
             mask = overlay_box.astype(bool)
             frame[mask] = cv2.addWeighted(frame, alpha, overlay_box, 1 - alpha, 0)[mask]
 
@@ -94,10 +94,10 @@ def label_faces(frame: Any, face_recognition_model: Any):
 
     detected_faces = face_recognition_model.detectMultiScale(
         image=cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
-        scaleFactor=1.05,
+        scaleFactor=1.1,
         minNeighbors=5,
         minSize=(30, 30),
-        flags=cv2.CASCADE_SCALE_IMAGE
+        flags=cv2.CASCADE_DO_ROUGH_SEARCH
     )
 
     detected_face_boxes = [(y, x + w, y + h, x) for (x, y, w, h) in detected_faces]
@@ -106,7 +106,11 @@ def label_faces(frame: Any, face_recognition_model: Any):
     names = []
 
     for encoding in encodings:
-        matches = face_recognition.compare_faces(data["encodings"], encoding)
+        matches = face_recognition.compare_faces(
+            known_face_encodings=data["encodings"],
+            face_encoding_to_check=encoding,
+            tolerance=0.4
+        )
         name = "Unknown"
 
         if True in matches:

@@ -17,7 +17,7 @@ load_dotenv()
 
 if __name__ == "__main__":
     hugging_face_token = os.environ["HUGGING_FACE_TOKEN"]
-    filename = "powell-1"
+    filename = "Rick Astley - Never Gonna Give You Up"
     input_video_filename = f"media/input/{filename}.mp4"
     input_audio_filename = f"media/audio/{filename}.wav"
     transcript_filename = f"media/transcripts/{filename}.whs"
@@ -62,7 +62,8 @@ if __name__ == "__main__":
         should_highlight_faces=True,
         should_label_faces=True,
         transcription_segments=transcription_segments,
-        diarization_segments=diarization_segments
+        diarization_segments=diarization_segments,
+        should_show_preview=True
     )
 
     print("Exporting frames to video...")

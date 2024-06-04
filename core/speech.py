@@ -6,7 +6,7 @@ import whisper
 from pyannote.audio import Pipeline
 from pyannote.database.util import load_lab
 
-from classes import FiresideSegment
+from core.classes import FiresideSegment
 
 
 def transcribe(audio_filename: str, output_filename: str) -> list[FiresideSegment]:
