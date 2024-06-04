@@ -4,16 +4,29 @@ A simple Python project that provides transcription, speaker diarization, and fa
 
 More to come!
 
-## Preparing
+## Preparing Environment
 
 1. Create a .env file in the root of the cloned project, and add an environment variable `HUGGING_FACE_TOKEN` with your [Hugging Face token](https://huggingface.co/docs/hub/security-tokens) as the value.
 2. Accept the conditions of use for the [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1) pipeline on Hugging Face.
-3. Create a `media` folder in the project root.
-4. In the `media` folder, create an `input` folder, and put your video files in that folder.
-5. Install [Homebrew](https://brew.sh), and run `brew install ffmpeg` in your Terminal.
+3. Install [Homebrew](https://brew.sh), and run `brew install ffmpeg` in your Terminal.
+4. Run `pip install -r requirements.txt` in your Terminal, from the project root.
+
+## Preparing Video Input
+
+1. Create a `media` folder in the project root.
+2. In the `media` folder, create an `input` folder, and put your video files in that folder.
+
+## Preparing Face Recognition Data
+
+If you are using face recognition (`label_faces`), you will need to prepare a set of embeddings to use.
+
+1. Create a `models` folder in the project root.
+2. In the `models` folder, create a `faces` folder.
+3. In the `faces` folder, insert photos of people you want to identify, separated by folders based on the person.
+4. Run `training.py` to generate the embeddings required for face recognition.
 
 ## Running
 
-5. Change the `filename` variable in `main.py` to point to the video file you want to process, excluding the file extension.
-6. Run `main.py`.
-7. Open the `output` folder in the `media` folder to see the generated output.
+1. Change the `filename` variable in `main.py` to point to the video file you want to process, excluding the file extension.
+2. Run `main.py`.
+3. Open the `output` folder in the `media` folder to see the generated output.

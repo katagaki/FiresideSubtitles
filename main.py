@@ -1,22 +1,23 @@
 import os
+import wave
 
 from dotenv import load_dotenv
 
-from core import (
+from core.drawing import update_frames
+from core.speech import transcribe, diarize
+from core.videos import (
     open_video_file,
     extract_audio_from_video,
-    transcribe,
-    diarize,
-    update_frames,
     export_video,
-    replace_audio_in_video
+    replace_audio_in_video,
+    get_video_metadata
 )
 
 load_dotenv()
 
 if __name__ == "__main__":
     hugging_face_token = os.environ["HUGGING_FACE_TOKEN"]
-    filename = "Kitchen Nightmare's Most Ridiculous Moments"
+    filename = "powell-1"
     input_video_filename = f"media/input/{filename}.mp4"
     input_audio_filename = f"media/audio/{filename}.wav"
     transcript_filename = f"media/transcripts/{filename}.whs"
@@ -24,49 +25,56 @@ if __name__ == "__main__":
     audioless_output_video_filename = f"media/output/.{filename}.mp4"
     final_output_video_filename = f"media/output/{filename}.mp4"
 
-    # Open video file
+    print("Opening video file...")
     video_capture = open_video_file(
         video_filename=input_video_filename
     )
+    frames_per_second, video_width, video_height = get_video_metadata(video_capture)
+    print(f"Video framerate: {frames_per_second}")
+    print(f"Video width: {video_width}")
+    print(f"Video height: {video_height}")
 
-    # Get audio track of video file
-    audio_sample_rate = extract_audio_from_video(
+    print("Extracting audio from video...")
+    extract_audio_from_video(
         video_filename=input_video_filename,
         output_filename=input_audio_filename
     )
+    audio_file = wave.open(input_audio_filename, "rb")
+    audio_sample_rate = audio_file.getframerate()
+    audio_file.close()
+    print(f"Audio sample rate: {audio_sample_rate}")
 
-    # Get transcription from OpenAI Whisper
+    print("Transcribing...")
     transcription_segments = transcribe(
         audio_filename=input_audio_filename,
         output_filename=transcript_filename
     )
 
-    # Diarize audio file
+    print("Diarizing...")
     diarization_segments = diarize(
         audio_filename=input_audio_filename,
         output_filename=diarization_filename,
         hugging_face_token=hugging_face_token
     )
 
-    # Draw frames
     frames = update_frames(
         video_capture=video_capture,
-        detect_faces=True,
+        should_highlight_faces=True,
+        should_label_faces=True,
         transcription_segments=transcription_segments,
         diarization_segments=diarization_segments
     )
 
-    # Output frames
+    print("Exporting frames to video...")
     export_video(
         video_capture=video_capture,
         frames=frames,
         output_filename=audioless_output_video_filename
     )
 
-    # Clean up video capture
     video_capture.release()
 
-    # Add audio file to output video
+    print("Combining video and audio...")
     replace_audio_in_video(
         video_filename=audioless_output_video_filename,
         audio_filename=input_audio_filename,
