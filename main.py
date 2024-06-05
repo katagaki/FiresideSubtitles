@@ -4,6 +4,7 @@ import wave
 
 from dotenv import load_dotenv
 
+from core.classes import FiresideFaceToSpeakerMapping
 from core.drawing import show_frame, close_frame_preview, scale_down_frame_if_larger_than_720p
 from core.faces import get_face_detection_model, get_face_recognition_model, extract_faces_with_names, label_faces
 from core.speech import transcribe, diarize
@@ -76,6 +77,7 @@ if __name__ == "__main__":
         face_encoding_mappings = pickle.loads(encodings_file.read())
 
     print("Drawing new frames...")
+    face_to_speaker_mappings: list[FiresideFaceToSpeakerMapping] = []
     frames: list = []
     frames_per_second, _, video_height = get_video_metadata(video_capture)
     frame_count: int = 0
@@ -92,6 +94,7 @@ if __name__ == "__main__":
                 face_recognition_model=face_recognition_model,
                 face_encoding_mappings=face_encoding_mappings
             )
+            faces = [face for face in faces if face.name != "Unknown"]
             label_faces(
                 frame=frame,
                 faces=faces
@@ -100,6 +103,22 @@ if __name__ == "__main__":
             current_time = frame_count / frames_per_second
             current_text = segment_value_for_current_time(current_time, transcription_segments)
             current_speaker = segment_value_for_current_time(current_time, diarization_segments)
+
+            # Get mapping
+            existing_face_to_speaker_mappings = [
+                mapping for mapping in face_to_speaker_mappings if mapping.speaker_name == current_speaker
+            ]
+            if len(existing_face_to_speaker_mappings) == 1:
+                current_speaker = existing_face_to_speaker_mappings[0].person_name
+            elif len(faces) == 1:
+                face_to_speaker_mappings.append(FiresideFaceToSpeakerMapping(
+                    speaker_name=current_speaker,
+                    person_name=faces[0].name
+                ))
+                current_speaker = faces[0].name
+            else:
+                current_speaker = None
+
             draw_subtitles(
                 frame=frame,
                 speaker_name=current_speaker,
