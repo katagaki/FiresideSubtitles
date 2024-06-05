@@ -11,7 +11,9 @@ RUN pip install -r requirements.txt
 COPY ./models ./models
 COPY ./*.py ./
 
-RUN addgroup -S firesider && adduser -S firesider -G firesider
-USER firesider
+RUN groupadd -r firesiders -g 998
+RUN useradd snake
+RUN usermod -aG firesiders snake
+USER snake
 
 CMD ["python", "main.py"]
