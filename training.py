@@ -6,7 +6,10 @@ import face_recognition
 from imutils import paths
 
 
-def train_face_model(images_path: str, output_model_filename: str):
+def train_face_model(
+        images_path: str = "models/faces",
+        output_model_filename: str = "models/faces/faces.pickle"
+):
     images = list(paths.list_images(images_path))
 
     known_encodings = []
@@ -33,7 +36,4 @@ def train_face_model(images_path: str, output_model_filename: str):
 
 
 if __name__ == "__main__":
-    train_face_model(
-        images_path="models/faces",
-        output_model_filename="models/faces/faces.pickle"
-    )
+    train_face_model()

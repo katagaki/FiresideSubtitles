@@ -6,7 +6,21 @@ More to come!
 
 ## Preparing Environment
 
-1. Create a .env file in the root of the cloned project, and add an environment variable `HUGGING_FACE_TOKEN` with your [Hugging Face token](https://huggingface.co/docs/hub/security-tokens) as the value.
+1. Prepare the `.env` file in the root of the cloned project with the following keys:
+    - `HUGGING_FACE_TOKEN`: Specifies the [Hugging Face token](https://huggingface.co/docs/hub/security-tokens) to use
+    - `SHOULD_TRAIN_FACES_BEFORE_EXECUTION`: Specifies whether face recognition data should be retrained before execution
+    - `SHOULD_SHOW_PREVIEWS`: Specifies whether a preview of the current frame will be displayed during processing
+    - `FILENAME_TO_PROCESS`: Specifies the filename to process, without its extension
+
+    ```dotenv
+    HUGGING_FACE_TOKEN=xxxxx
+
+    SHOULD_TRAIN_FACES_BEFORE_EXECUTION=1
+    SHOULD_SHOW_PREVIEWS=1
+
+    FILENAME_TO_PROCESS="Rick Astley - Never Gonna Give You Up"
+    ```
+
 2. Accept the conditions of use for the [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1) pipeline on Hugging Face.
 3. Install [Homebrew](https://brew.sh), and run `brew install ffmpeg` in your Terminal.
 4. Run `pip install -r requirements.txt` in your Terminal, from the project root.

@@ -1,10 +1,13 @@
 import os
+import pickle
 import wave
 
 from dotenv import load_dotenv
 
-from core.drawing import update_frames
+from core.drawing import show_frame, close_frame_preview, scale_down_frame_if_larger_than_720p
+from core.faces import get_face_detection_model, get_face_recognition_model, extract_faces_with_names, label_faces
 from core.speech import transcribe, diarize
+from core.subtitles import draw_subtitles, segment_value_for_current_time
 from core.videos import (
     open_video_file,
     extract_audio_from_video,
@@ -12,12 +15,17 @@ from core.videos import (
     replace_audio_in_video,
     get_video_metadata
 )
+from training import train_face_model
 
 load_dotenv()
 
 if __name__ == "__main__":
+
+    if os.environ.get("SHOULD_TRAIN_FACES_BEFORE_EXECUTION", "0") == "1":
+        train_face_model()
+
     hugging_face_token = os.environ["HUGGING_FACE_TOKEN"]
-    filename = "Rick Astley - Never Gonna Give You Up"
+    filename = os.environ["FILENAME_TO_PROCESS"]
     input_video_filename = f"media/input/{filename}.mp4"
     input_audio_filename = f"media/audio/{filename}.wav"
     transcript_filename = f"media/transcripts/{filename}.whs"
@@ -29,6 +37,7 @@ if __name__ == "__main__":
     video_capture = open_video_file(
         video_filename=input_video_filename
     )
+
     frames_per_second, video_width, video_height = get_video_metadata(video_capture)
     print(f"Video framerate: {frames_per_second}")
     print(f"Video width: {video_width}")
@@ -39,6 +48,7 @@ if __name__ == "__main__":
         video_filename=input_video_filename,
         output_filename=input_audio_filename
     )
+
     audio_file = wave.open(input_audio_filename, "rb")
     audio_sample_rate = audio_file.getframerate()
     audio_file.close()
@@ -57,14 +67,57 @@ if __name__ == "__main__":
         hugging_face_token=hugging_face_token
     )
 
-    frames = update_frames(
-        video_capture=video_capture,
-        should_highlight_faces=True,
-        should_label_faces=True,
-        transcription_segments=transcription_segments,
-        diarization_segments=diarization_segments,
-        should_show_preview=True
-    )
+    print("Initializing face detection...")
+    face_detection_model = get_face_detection_model()
+
+    print("Initializing face recognition...")
+    face_recognition_model = get_face_recognition_model()
+    with open("models/faces/faces.pickle", "rb") as encodings_file:
+        face_encoding_mappings = pickle.loads(encodings_file.read())
+
+    print("Drawing new frames...")
+    frames: list = []
+    frames_per_second, _, video_height = get_video_metadata(video_capture)
+    frame_count: int = 0
+    is_frame_read_successfully: bool = True
+    should_break_out_of_loop: bool = False
+    while is_frame_read_successfully and not should_break_out_of_loop:
+        is_frame_read_successfully, frame = video_capture.read()
+
+        try:
+            frame = scale_down_frame_if_larger_than_720p(frame)
+
+            faces = extract_faces_with_names(
+                frame=frame,
+                face_recognition_model=face_recognition_model,
+                face_encoding_mappings=face_encoding_mappings
+            )
+            label_faces(
+                frame=frame,
+                faces=faces
+            )
+
+            current_time = frame_count / frames_per_second
+            current_text = segment_value_for_current_time(current_time, transcription_segments)
+            current_speaker = segment_value_for_current_time(current_time, diarization_segments)
+            draw_subtitles(
+                frame=frame,
+                speaker_name=current_speaker,
+                text=current_text
+            )
+
+            frames.append(frame)
+
+            if os.environ.get("SHOULD_SHOW_PREVIEWS", "0") == "1":
+                should_break_out_of_loop = show_frame(frame)
+
+        except AttributeError as e:
+            print(e)
+
+        frame_count += 1
+        print(".", end="")
+
+    close_frame_preview()
 
     print("Exporting frames to video...")
     export_video(

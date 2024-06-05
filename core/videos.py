@@ -47,6 +47,6 @@ def replace_audio_in_video(video_filename: str, audio_filename: str, output_file
     output_video_with_original_video_audio = output_video_clip.set_audio(original_video_audio)
     output_video_with_original_video_audio.write_videofile(
         filename=output_filename,
-        codec="libx264",
-        audio_codec="pcm_s16le"
+        # codec="libx264",
+        # audio_codec="pcm_s16le"
     )
