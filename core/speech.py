@@ -7,9 +7,11 @@ from pyannote.audio import Pipeline
 from pyannote.database.util import load_lab
 
 from core.classes import FiresideSegment
+from core.io import create_folder_for_file
 
 
 def transcribe(audio_filename: str, output_filename: str) -> list[FiresideSegment]:
+    create_folder_for_file(output_filename)
     if not os.path.exists(output_filename):
         whisper_model = whisper.load_model(
             name="medium.en",

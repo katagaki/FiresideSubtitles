@@ -14,8 +14,11 @@ def scale_down_frame_if_larger_than_720p(frame) -> Any:
         return frame
 
 
-def show_frame(frame, window_title: str = "Frame Preview") -> bool:
+def show_frame(frame, window_title: str = "Frame Preview"):
     cv2.imshow(window_title, frame)
+
+
+def did_user_send_cancel_signal() -> bool:
     if cv2.waitKey(1) & 0xFF == ord("q"):
         return True
     return False

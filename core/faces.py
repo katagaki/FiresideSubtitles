@@ -88,8 +88,11 @@ def extract_faces_without_names(frame: Any, face_detection_model: Any) -> list[F
     return found_faces
 
 
-def extract_faces_with_names(frame: Any, face_recognition_model: Any, face_encoding_mappings: Any) -> list[
-    FiresideFace]:
+def extract_faces_with_names(
+        frame: Any,
+        face_recognition_model: Any,
+        face_encoding_mappings: Any
+) -> list[FiresideFace]:
     current_name = "Unknown"
 
     detected_faces = face_recognition_model.detectMultiScale(
