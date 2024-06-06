@@ -41,6 +41,5 @@ If you are using face recognition (`label_faces`), you will need to prepare a se
 
 ## Running
 
-1. Change the `filename` variable in `main.py` to point to the video file you want to process, excluding the file extension.
-2. Run `main.py`.
-3. Open the `output` folder in the `media` folder to see the generated output.
+1. Run `main.py`.
+2. Open the `output` folder in the `media` folder to see the generated output.
