@@ -22,7 +22,7 @@ More to come!
     ```
 
 2. Accept the conditions of use for the [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1) pipeline on Hugging Face.
-3. Install [Homebrew](https://brew.sh), and run `brew install ffmpeg` in your Terminal.
+3. Install [Homebrew](https://brew.sh), and run `brew install ffmpeg cmake` in your Terminal.
 4. Run `pip install -r requirements.txt` in your Terminal, from the project root.
 
 ## Preparing Video Input

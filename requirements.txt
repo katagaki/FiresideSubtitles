@@ -8,3 +8,4 @@ pocketsphinx==5.0.3
 pyannote.audio==3.2.0
 python-dotenv==1.0.1
 torch==2.3.0
+urllib3==1.26.6
